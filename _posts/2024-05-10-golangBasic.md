@@ -1,6 +1,6 @@
 ---
 layout: single
-title: '"Golang 기초"'
+title: Golang 기초
 categories: golang
 tags: 
 sidebar: 
