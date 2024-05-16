@@ -2,9 +2,9 @@
 layout: single
 title: Golang 기초
 categories: golang
-tags: 
+tag: 
 sidebar: 
-nav: counts
+	nav: "counts"
 search: true
 use_math: false
 ---
