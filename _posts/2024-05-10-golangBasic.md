@@ -105,9 +105,9 @@ go 1.20
 package main
 
 import (  
-"fmt"  
-  
-"github.com/YunKyungho/learn-golang/basic/mymod"
+	"fmt"  
+	
+	"github.com/YunKyungho/learn-golang/basic/mymod"
 )
 
 func main() {   
