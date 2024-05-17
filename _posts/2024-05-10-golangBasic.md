@@ -9,6 +9,7 @@ search: true
 use_math: false
 ---
 
+
 >설치 및 환경 설정은 공식 문서를 참고 바랍니다.
 >https://go.dev/doc/
 
@@ -55,7 +56,6 @@ package mymod
 파일 내부에서 패키지명을 폴더명과 통일 시켜줘야 한다.
 다만 파일명은 mymod.go가 아닌 무엇으로 해도 상관없다.
 
----
 ## Import
 
 표준 라이브러리를 import 하는 것은 다른 언어와 같이 어렵지 않다.
@@ -106,7 +106,7 @@ package main
 
 import (  
 	"fmt"  
-	
+	  
 	"github.com/YunKyungho/learn-golang/basic/mymod"
 )
 
@@ -116,7 +116,6 @@ func main() {
 ```
 여러 package를 import 할 때는 위 처럼 소괄호 안쪽에 엔터로 구분하여 작성한다.
 
----
 ## Variables and Constants
 
 >문법, 키워드, 연산자, 타입 등을 자세히 확인하려면 아래 공식 문서를 참고하자.
@@ -182,7 +181,6 @@ age = "28" // -> 오류 발생
 ```
 그 예로 위 처럼 변수 선언 후 다른 타입의 값을 할당할 경우 오류가 발생한다.
 
----
 ## Function
 
 go에서는 함수명의 첫 글자로 접근성을 제어한다.
@@ -399,7 +397,6 @@ done
 12 ANOTHER WORD
 ```
 
----
 ## Loop
 
 go에서 반복문은 for 밖에 없다. 
@@ -481,7 +478,6 @@ func loopWithParameter(numbers ...int) int {
 15
 ```
 
----
 ## Conditional
 
 go에서는 조건문의 조건식에서 변수를 정의할 수 있다.
@@ -553,8 +549,6 @@ func useSwitch2(age int) bool {
 }
 ```
 
-
----
 ## Pointer
 
 다음 코드의 출력 값을 예상해보자.
@@ -608,7 +602,6 @@ func main() {
 쉽게 말해서 &를 붙히면 변수의 주소를 * 를 붙히면 주소의 값을 바라볼 수 있다.
 >b는 a를 살펴보는 pointer가 된다.
 
----
 ## Array
 
 go의 array는 길이를 제한 하는 방법과 그렇지 않은 방법으로 나뉜다.
@@ -650,7 +643,6 @@ arr := [...]int{1, 2, 3}
 
 >slice에 요소 없이 비어있는 slice로도 정의가 가능하다.
 
----
 ## Map
 
 python의 dict 같은 건데 좀 다르다.
@@ -700,8 +692,7 @@ func checkKey(ex_map map[string]int) {
 
 또한 map안에 찾는 키가 존재하지 않는다면 **reference 타입인 경우 nil**을 **value 타입인 경우 zero**를 리턴한다.
 
----
-## Structs
+## Struct
 
 go에서 map은 key와 value의 타입이 정의할 때 지정해둔 타입으로 고정된다.
 다른 타입으로 데이터를 추가하려고 하면 오류가 발생한다.
@@ -761,3 +752,269 @@ python의 keyword 인자 처럼 사용하면 된다.
 >다만 field: value 형태로 한번 적었다면 모든 변수를 다 같은 형식으로 작성해야한다.
 
 여러모로 다른 언어들의 Class와 비슷한 느낌이지만 struct에는 생성자 함수가 없어서 따로 생성자 메서드를 만들고 직접 실행해주어야한다.
+
+만약 외부 패키지에 있는 struct를 참조해야한다면 함수에서 그랬던 것 처럼 struct 명이 소문자로 시작하면 private, 대문자로 시작하면 public 이다. struct 뿐만 아니라 내부의 변수들도 마찬가지다.
+
+```go
+package public  
+  
+type PublicStruct struct {  
+	AnyString string  
+	AnyInt int  
+}  
+  
+type privateStruct struct {  
+	anyString string  
+	anyInt int  
+}
+```
+
+```go
+package main
+
+import (  
+	"fmt"  
+	"github.com/YunKyungho/learn-golang/structs/public"  
+)  
+  
+func main() {  
+  
+	ps := public.PublicStruct{AnyString: "any", AnyInt: 93}  
+	fmt.Println(ps)  
+	// public.privateStruct -> 오류 발생  
+}
+```
+
+그런데 문제는 public으로 작성 시 아래 처럼 변수의 값을 변경하기 매우 쉬워진다.
+```go
+func main() {  
+  
+	ps := public.PublicStruct{AnyString: "any", AnyInt: 93}  
+	fmt.Println(ps)  
+	// public.privateStruct -> 오류 발생  
+	ps.AnyString = "diff"
+}
+```
+
+### constructor
+
+외부 패키지로 struct를 export 하지만 내부 변수는 외부의 접근을 막고 싶다면 생성자를 사용하여 struct를 생성해야 한다. Go에서 생성자를 만드는 방식은 다음과 같다.
+```go
+package public  
+    
+type privateStruct struct {  
+	anyString string  
+	anyInt int  
+}
+
+func PublicFunc(anyString string) *privateStruct {  
+	ps := privateStruct{anyString: anyString, anyInt: 0}  
+	return &ps  
+}
+```
+
+main에서는 다음과 같이 사용한다.
+```go
+func main() {  
+	useConstructorPs := public.PublicFunc("any")  
+	fmt.Println(*useConstructorPs)  
+	// useConstructorPs.anyString = "another" -> 오류 발생  
+	// useConstructorPs.anyInt = 1818 -> 오류 발생  
+}
+```
+
+>구조체의 복사본이 아닌 포인터로 반환 하는 이유는 더 효율적이기 때문이다.
+>메모리 복사는 오버헤드가 크며 성능을 저하할 수 있다.
+
+다만 이렇게 사용할 시 외부에서는 전혀 내부 변수의 값을 변경할 수 없다.
+이럴 때 method를 만들어서 사용한다.
+
+### method
+
+```go
+// project_root/method/main.go
+
+package main  
+  
+import "github.com/YunKyungho/learn-golang/method/myStruct"  
+  
+func main() {  
+	account := myStruct.NewAccount("ygh")  
+	account.Deposit(10)  
+}
+```
+
+```go
+// project_root/method/myStruct/test.go
+
+package myStruct  
+  
+type Account struct {  
+	owner string  
+	balance int  
+}  
+
+// go에서의 constructor
+func NewAccount(owner string) *Account {  
+	account := Account{owner: owner, balance: 0}  
+	return &account  
+}  
+
+// go에서의 method
+func (a Account) Deposit(amount int) {  
+	// 여기서 a는 receiver라고 불리며 a의 type은 Account이다.
+	// struct의 첫 글자를 소문자로 사용하는 것이 관행이다.
+	a.balance += amount  
+}
+```
+
+>위에서 볼 수 있듯이 go의 메소드는 다른 PL 처럼 class(struct) 내부에 정의되지 않고
+>위 같은 방식으로 표현한다.
+
+만약 main에서 account의 balance를 출력하고 싶다면 getter가 필요할 것이다.
+```go
+// project_root/method/myStruct/test.go
+
+func (a Account) Balance() int {  
+	return a.balance  
+}
+```
+
+main에서는 아래 처럼 사용한다.
+```go
+package main  
+  
+import (  
+	"fmt"  
+	"github.com/YunKyungho/learn-golang/method/myStruct"  
+)  
+  
+func main() {  
+	account := myStruct.NewAccount("ygh")  
+	account.Deposit(10)  
+	fmt.Println(account.Balance())  
+}
+```
+
+실행해보면 알겠지만 문제가 있다. 10이 아닌 Account struct의 balance 기본 값인 0이 출력된다.
+
+문제는 method의 receiver에 있다. 아래는 위 코드를 수정한 것이다.
+```go
+// project_root/method/myStruct/test.go
+
+package myStruct  
+  
+type Account struct {  
+	owner string  
+	balance int  
+}  
+
+// go에서의 constructor
+func NewAccount(owner string) *Account {  
+	account := Account{owner: owner, balance: 0}  
+	return &account  
+}  
+
+// go에서의 method
+func (a *Account) Deposit(amount int) {  
+	a.balance += amount  
+}
+
+// go에서의 getter
+func (a *Account) Balance() int {  
+	return a.balance  
+}
+```
+
+method의 receiver에 사용될 struct 앞에는 꼭 * 을 붙혀주어야한다.
+
+Go는 함수를 실행할 때나 반환할 때 변수에 * 을 붙히지 않으면 항상 복사본을 만들어 receive 하거나 return 한다. 위에서 값이 0이 출력됬던 것도 Deposit() method 실행 시 생성했던 account의 복사본을 받아와서 값을 변경 했기에 원본 account에는 어떠한 영향도 끼치지 않았던 것이다.
+
+### magic method?
+python과 마찬가지로 어떻게 사용되냐에 따라 자동으로 호출되는 magic method 같은 개념이 go에서도 존재한다. (반복문에 이터레이터로 사용될 객체를 지정하면 자동으로 해당 객체의 next method를 호출하는 등의 기능)
+
+Account struct에 다음 method를 추가한 뒤 실행시켜 보자.
+```go
+func (a *Account) Owner() string {  
+	return a.owner  
+}  
+  
+func (a *Account) String() string {  
+	return fmt.Sprint(a.Owner(), "'s account.\nHas: ", a.Balance())  
+}
+```
+
+```go
+// main.go
+
+package main  
+  
+import (  
+	"fmt"  
+	"github.com/YunKyungho/learn-golang/except/accounts"  
+	"log"  
+)  
+  
+func main() {  
+	account := accounts.NewAccount("ygh")  
+	account.Deposit(10)  
+	fmt.Println(account)  
+}
+
+```
+
+String 함수 작성 전 기존 fmt.Println(account) 실행 시 &{owner, balance} 형식으로 출력됬던 반면
+아래 처럼 값이 출력됬을 것이다.
+```bash
+ygh's account.
+Has: 10 
+```
+
+## except
+
+먼저 Go에는 try - catch나 try - except 같은 문법이 없다.
+직접 if 문을 통해 확인하고 error를 return 하는 식으로 function을 만들어야 한다.
+또한 이를 호출한 곳에서 직접 예외처리를 해주어야 한다.
+
+위의 Account struct의 계좌에서 돈을 출금하는 Withdraw라는 method를 만들어보자.
+```go
+import "errors"
+
+func (a *Account) Withdraw(amount int) error {  
+	if a.balance < amount {  
+		return errors.New("insufficient balance")  
+	}  
+	a.balance -= amount  
+	return nil  
+}
+```
+위 코드가 일반적인 에러 반환 방법이다. 
+>자주 쓰는 error 같은 경우 errors.New()를 변수에 저장해두고 변수를 return 하는 방식으로도 사용된다.
+
+error를 반환한다고 해서 go에서 알아서 에러처리를 해주지 않는다.
+main에서 이를 사용할 때 다음과 같은 분기처리가 필요하다.
+```go
+package main  
+  
+import (  
+	"fmt"  
+	"github.com/YunKyungho/learn-golang/except/accounts"  
+	"log"  
+)  
+  
+func main() {  
+	account := accounts.NewAccount("ygh")  
+	account.Deposit(10)  
+	fmt.Println(account.Balance())  
+	
+	err := account.Withdraw(20)  
+	if err != nil {  
+		log.Fatalln(err)  
+	}  
+}
+```
+함수 처리 결과를 err 변수에 저장하고 nil(error가 아닌 경우)이 아닐 때 log.Fatalln 함수를 실행한다.
+(log.Fatalln는 오류 문구를 출력하고 프로그램을 종료한다.)
+
+>error 처리를 전부 직접 해야 되서 매우 귀찮긴 하지만 error를 체크하도록 강제 시킨다는 점에서 괜찮은 것 같다.
+
