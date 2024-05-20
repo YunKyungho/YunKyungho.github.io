@@ -1,14 +1,13 @@
 ---
 layout: single
-title: Golang 기초
+title:  "Golang 기초"
 categories: golang
 tag: 
-sidebar: 
-	nav: "counts"
+sidebar:
+    nav: "counts"
 search: true
 use_math: false
 ---
-
 
 >설치 및 환경 설정은 공식 문서를 참고 바랍니다.
 >https://go.dev/doc/
