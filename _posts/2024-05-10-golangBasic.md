@@ -1017,3 +1017,57 @@ func main() {
 
 >error 처리를 전부 직접 해야 되서 매우 귀찮긴 하지만 error를 체크하도록 강제 시킨다는 점에서 괜찮은 것 같다.
 
+## Type
+
+struct에 method를 만들 수 있었던 것은 struct의 성질 때문이 아니라 type의 성질 때문이었다.
+이 말은 struct 뿐만 아니라 다른 타입의 자료형에도 method를 만들어줄 수 있다는 것이다.
+
+map을 통해 설명 해보자.
+```go
+// project_root/dict/myDict/myDict.go
+
+package myDict  
+  
+import "errors"  
+  
+type Dictionary map[string]string  
+// type은 int도 되고 string도 되고 다 된다.
+  
+var errNotFound = errors.New("Not Found")  
+  
+func (d Dictionary) Search(word string) (string, error) {  
+	value, exists := d[word]  
+	// 무슨 의미인지 모르겠다면 map 단원을 보고 오자.
+	if exists {  
+		return value, nil  
+	}  
+	return "", errNotFound  
+}
+```
+
+struct 단원에서 method를 설명할 때와 동일하게 receiver를 통해 Dictionary의 method를 만들었다.
+main에서 이전에 만든 struct의 method와 동일하게 사용 가능하다.
+
+```go
+// project_root/dict/main.go
+
+package main  
+  
+import (  
+	"fmt"  
+	"github.com/YunKyungho/learn-golang/dict/myDict"  
+)  
+  
+func main() {  
+	dictionary := myDict.Dictionary{"first": "First word"}
+	// 기본적인 map 생성 방식.  
+	definition, err := dictionary.Search("second")  
+	if err != nil {  
+		fmt.Println(err)  
+	} else {  
+		fmt.Println(definition)  
+	}  
+}
+```
+
+예시를 위한 설명이지 실제로 map을 이렇게 쓰는지는 모르겠으나, 위 같은 방식으로 python에 있는 dict의 get method나 setdefault method를 만드는 것은 유용할 수도 있겠다. 
